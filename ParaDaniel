@@ -87,8 +87,7 @@
 
     <h1 id="titulo">Você aceita um desafio?</h1>
     <button id="botao-fujao">Clique Aqui</button>
-    <h1 id="mensagem-final">Feliz Dia dos Namorados 
-        Eu amo você! ❤️</h1>
+    <h1 id="mensagem-final">Eu amo você! ❤️</h1>
 
     <script>
         const botao = document.getElementById('botao-fujao');
@@ -96,7 +95,7 @@
         const mensagemFinal = document.getElementById('mensagem-final');
         
         let tentativas = 0;
-        const maxTentativas = 10; // Quantas vezes o botão vai fugir antes de deixar clicar
+        const maxTentativas = 4; // Quantas vezes o botão vai fugir antes de deixar clicar
 
         // Centraliza o botão no início
         botao.style.left = '50%';
@@ -177,7 +176,7 @@
             const giroAleatorio = Math.random() * 360 + 'deg';
 
             coracao.style.setProperty('--x', voarX);
-            coracao.style.setProperty('--y', voarY)
+            coracao.style.setProperty('--y', voarY);
             coracao.style.setProperty('--escala', escalaAleatoria);
             coracao.style.setProperty('--giro', giroAleatorio);
 
