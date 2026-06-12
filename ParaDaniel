@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Um Desafio para Você</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #0b010d;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            position: relative;
+        }
+
+        /* Título inicial do jogo */
+        #titulo {
+            color: #ffffff;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            text-align: center;
+            transition: all 0.5s ease;
+        }
+
+        /* O botão que vai fugir */
+        #botao-fujao {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            background-color: #ff3366;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 0 15px rgba(255, 51, 102, 0.4);
+            transition: all 0.2s ease;
+            position: absolute; /* Necessário para mover o botão livremente */
+        }
+
+        /* Mensagem secreta que começa escondida */
+        #mensagem-final {
+            color: #ff3366;
+            font-size: 4rem;
+            text-shadow: 0 0 25px rgba(255, 51, 102, 0.7);
+            display: none; /* Esconde o texto no começo */
+            text-align: center;
+            animation: pulsar 2s infinite alternate;
+        }
+
+        @keyframes pulsar {
+            from { transform: scale(1); }
+            to { transform: scale(1.08); }
+        }
+
+        /* Estilo dos corações que vão explodir na tela */
+        .coracao-explosao {
+            position: absolute;
+            color: #ff4d6d;
+            pointer-events: none;
+            animation: voar 2s ease-out forwards;
+        }
+
+        @keyframes voar {
+            0% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 1;
+            }
+            100% {
+                /* O JavaScript vai definir a direção para onde cada coração vai voar */
+                transform: translate(var(--x), var(--y)) scale(var(--escala)) rotate(var(--giro));
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1 id="titulo">Você aceita um desafio?</h1>
+    <button id="botao-fujao">Clique Aqui</button>
+    <h1 id="mensagem-final">Feliz Dia dos Namorados 
+        Eu amo você! ❤️</h1>
+
+    <script>
+        const botao = document.getElementById('botao-fujao');
+        const titulo = document.getElementById('titulo');
+        const mensagemFinal = document.getElementById('mensagem-final');
+        
+        let tentativas = 0;
+        const maxTentativas = 10; // Quantas vezes o botão vai fugir antes de deixar clicar
+
+        // Centraliza o botão no início
+        botao.style.left = '50%';
+        botao.style.top = '60%';
+        botao.style.transform = 'translate(-50%, -50%)';
+
+        // Função para mover o botão para um lugar aleatório
+        function fugir() {
+            if (tentativas < maxTentativas) {
+                // Calcula posições aleatórias na tela, deixando uma margem para o botão não sumir das bordas
+                const larguraJanela = window.innerWidth - 150;
+                const alturaJanela = window.innerHeight - 100;
+
+                const novoX = Math.random() * larguraJanela + 75;
+                const novoY = Math.random() * alturaJanela + 50;
+
+                // Aplica a nova posição tirando o posicionamento centralizado inicial
+                botao.style.transform = 'none';
+                botao.style.left = novoX + 'px';
+                botao.style.top = novoY + 'px';
+
+                tentativas++;
+                
+                // Muda o título para zoar a pessoa enquanto ela tenta
+                if (tentativas === 1) titulo.innerText = "Ei, pegue-me se puder! 😂";
+                if (tentativas === 3) titulo.innerText = "Está quase conseguindo... 😜";
+            } else {
+                // Na última tentativa, o botão para de fugir e fica gigante para a pessoa clicar!
+                titulo.innerText = "Tudo bem, você venceu! Clique agora:";
+                botao.style.left = '50%';
+                botao.style.top = '60%';
+                botao.style.transform = 'translate(-50%, -50%) scale(1.3)';
+                botao.style.backgroundColor = '#2ec4b6'; // Muda para verde indicando sucesso
+            }
+        }
+
+        // Detecta quando o mouse chega perto (computador) ou quando há um toque (celular)
+        botao.addEventListener('mouseover', fugir);
+        botao.addEventListener('touchstart', (e) => {
+            e.preventDefault(); // Evita bugs no celular
+            fugir();
+        });
+
+        // Quando a pessoa FINALMENTE conseguir clicar no botão
+        botao.addEventListener('click', () => {
+            if (tentativas >= maxTentativas) {
+                // Esconde o botão e o título inicial
+                botao.style.display = 'none';
+                titulo.style.display = 'none';
+
+                // Mostra a mensagem de amor
+                mensagemFinal.style.display = 'block';
+
+                // Cria a explosão de 50 corações!
+                for (let i = 0; i < 50; i++) {
+                    soltarCoracao();
+                }
+            }
+        });
+
+        // Função que gera a explosão de corações a partir do centro
+        function soltarCoracao() {
+            const coracao = document.createElement('div');
+            coracao.classList.add('coracao-explosao');
+            coracao.innerHTML = '❤️';
+
+            // Posiciona no centro da tela
+            coracao.style.left = '50%';
+            coracao.style.top = '50%';
+
+            // Cria direções e ângulos aleatórios usando variáveis do CSS (--x, --y)
+            const angulo = Math.random() * Math.PI * 2;
+            const distancia = Math.random() * 300 + 100; // Distância que o coração vai voar
+            
+            const voarX = Math.cos(angulo) * distancia + 'px';
+            const voarY = Math.sin(angulo) * distancia + 'px';
+            const escalaAleatoria = Math.random() * 2 + 0.5;
+            const giroAleatorio = Math.random() * 360 + 'deg';
+
+            coracao.style.setProperty('--x', voarX);
+            coracao.style.setProperty('--y', voarY)
+            coracao.style.setProperty('--escala', escalaAleatoria);
+            coracao.style.setProperty('--giro', giroAleatorio);
+
+            document.body.appendChild(coracao);
+
+            setTimeout(() => { coracao.remove(); }, 2000);
+        }
+    </script>
+</body>
+</html>
